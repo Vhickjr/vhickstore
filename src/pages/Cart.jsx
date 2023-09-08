@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
+import { PaystackButton } from "react-paystack";
 import { Footer, Navbar } from "../components";
 import { useSelector, useDispatch } from "react-redux";
 import { addCart, delCart } from "../redux/action";
 import { Link } from "react-router-dom";
+import "./Cart.css";
 
 const Cart = () => {
   const state = useSelector((state) => state.handleCart);
@@ -23,11 +25,31 @@ const Cart = () => {
     );
   };
 
+  const publicKey = "pk_test_b09a315defa52d58fe88160978cd1665f82d25fd";
+  const amount = 1000000; // Remember, set in kobo!
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+
   const addItem = (product) => {
     dispatch(addCart(product));
   };
   const removeItem = (product) => {
     dispatch(delCart(product));
+  };
+
+  const componentProps = {
+    email,
+    amount,
+    metadata: {
+      name,
+      phone,
+    },
+    publicKey,
+    text: "Pay Now",
+    onSuccess: () =>
+      alert("Thanks for doing business with us! Come back soon!!"),
+    onClose: () => alert("Wait! You need this oil, don't go!!!!"),
   };
 
   const ShowCart = () => {
@@ -129,7 +151,8 @@ const Cart = () => {
                   <div className="card-body">
                     <ul className="list-group list-group-flush">
                       <li className="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
-                        Products ({totalItems})<span>${Math.round(subtotal)}</span>
+                        Products ({totalItems})
+                        <span>${Math.round(subtotal)}</span>
                       </li>
                       <li className="list-group-item d-flex justify-content-between align-items-center px-0">
                         Shipping
@@ -145,12 +168,10 @@ const Cart = () => {
                       </li>
                     </ul>
 
-                    <Link
-                      to="/checkout"
-                      className="btn btn-dark btn-lg btn-block"
-                    >
-                      Go to checkout
-                    </Link>
+                    <PaystackButton
+                      className="paystack-button"
+                      {...componentProps}
+                    />
                   </div>
                 </div>
               </div>
@@ -167,7 +188,46 @@ const Cart = () => {
       <div className="container my-3 py-3">
         <h1 className="text-center">Cart</h1>
         <hr />
-        {state.length > 0 ? <ShowCart /> : <EmptyCart />}
+        <div className="myApp">
+          <div className="myContainer">
+            <div className="myItem">
+              <img className="myItemImage" />
+              <div className="myItemDetails">
+                <p className="myItemDetailsTitle">Dancing Shoes</p>
+                <p className="myItemDetailsAmount">{amount}</p>
+              </div>
+            </div>
+            <div className="myCheckoutForm">
+              <form>
+                <label className="myCheckoutFieldLabel">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  onChange={(e) => setName(e.target.value)}
+                  className="myCheckoutFieldInput"
+                />
+                <label className="myCheckoutFieldLabel">Email</label>
+                <input
+                  type="text"
+                  id="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="myCheckoutFieldInput"
+                />
+                <label className="myCheckoutFieldLabel">Phone</label>
+                <input
+                  type="text"
+                  id="phone"
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="myCheckoutFieldInput"
+                />
+              </form>
+              <PaystackButton
+                {...componentProps}
+                className="myPaystackButton"
+              />
+            </div>
+          </div>
+        </div>
       </div>
       <Footer />
     </>
